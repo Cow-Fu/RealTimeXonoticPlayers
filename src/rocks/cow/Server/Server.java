@@ -16,6 +16,18 @@ public class Server {
     // need player class first
     // private ArrayList<Player> players;
 
+    public Server(String hostname, String name, Optional<String> gameType, String map, int numplayers, int maxplayers, int ping, int retries, HashMap<String, String> rules) {
+        this.hostname = hostname;
+        this.name = name;
+        this.gameType = gameType;
+        this.map = map;
+        this.numplayers = numplayers;
+        this.maxplayers = maxplayers;
+        this.ping = ping;
+        this.retries = retries;
+        this.rules = rules;
+    }
+
 
     public String getHostname() {
         return hostname;
