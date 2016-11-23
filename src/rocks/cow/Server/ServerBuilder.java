@@ -129,7 +129,6 @@ public class ServerBuilder {
 
             NodeList nodeList = (NodeList) xpath.evaluate("rule", node, XPathConstants.NODESET);
 
-            HashMap<String, String> rules = new HashMap<String, String>();
             for (int i = 0; i < nodeList.getLength(); ++i) {
                 Node nnode = nodeList.item(i);
                 rules.put(((Element) nnode).getAttribute("name"), nnode.getTextContent());
