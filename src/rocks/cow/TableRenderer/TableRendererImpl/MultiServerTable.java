@@ -1,11 +1,9 @@
 package rocks.cow.TableRenderer.TableRendererImpl;
+
 import de.vandermeer.asciitable.v2.RenderedTable;
 import de.vandermeer.asciitable.v2.V2_AsciiTable;
 import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer;
-import de.vandermeer.asciitable.v2.render.V2_Width;
 import de.vandermeer.asciitable.v2.render.WidthLongestLine;
-import de.vandermeer.asciitable.v2.render.WidthLongestWord;
-import de.vandermeer.asciitable.v2.row.RuleRowType;
 import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes;
 import rocks.cow.Server.ServerList.ServerList;
 import rocks.cow.TableRenderer.TableRenderer;

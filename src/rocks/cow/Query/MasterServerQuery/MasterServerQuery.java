@@ -1,9 +1,10 @@
-package rocks.cow.QueryMasterServer;
+package rocks.cow.Query.MasterServerQuery;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import rocks.cow.MasterServer.MasterServer;
+import rocks.cow.Query.Query;
 import rocks.cow.Server.ServerBuilder;
 import rocks.cow.Server.ServerList.ServerList;
 
@@ -13,23 +14,42 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
-public class QueryMasterServer {
+public class MasterServerQuery implements Query {
     private XPath xpath;
+    private Logger logger = Logger.getGlobal();
 
-    public QueryMasterServer() {
+    public MasterServerQuery() {
         xpath = XPathFactory.newInstance().newXPath();
     }
 
-    public Document getRawResult() throws IOException, SAXException, ParserConfigurationException {
-        return MasterServer.masterServerQuery();
+    @Override
+    public Document query() {
+        Document doc = null;
+        try {
+             doc = MasterServer.masterServerQuery();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+            logger.log(Level.SEVERE, "Unable to configure the parser!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.log(Level.SEVERE, "Unable to connect to master server!");
+
+        } catch (SAXException e) {
+            e.printStackTrace();
+            logger.log(Level.SEVERE, "Unable to read data from the master server!");
+        }
+        return doc;
     }
 
     public ServerList getServerList() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         ServerBuilder serverBuilder = new ServerBuilder();
         ServerList servers = new ServerList();
-        Document doc = getRawResult();
+        Document doc = query();
 
         NodeList nodelist = (NodeList) xpath.compile("/qstat/server")
                 .evaluate(doc, XPathConstants.NODESET);
