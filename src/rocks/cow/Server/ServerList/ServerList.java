@@ -3,20 +3,20 @@ package rocks.cow.Server.ServerList;
 import rocks.cow.Server.Server;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class ServerList extends ArrayList<Server> {
-    // TODO: Add other options to retrive servers by
+    // TODO: Add other options to retrieve servers by
     public static final byte PLAYERS = 0;
 
     public ServerList getBy(byte key) {
         ServerList temp = new ServerList();
         switch (key) {
             case 0: // Players
-                for (Server server : this) {
-                    if (server.getNumplayers() > 0) {
-                        temp.add(server);
-                    }
-                }
+                this.stream()
+                        .filter(server -> server.getNumplayers() > 0)
+                        .sorted(Comparator.comparingInt(Server::getNumplayers).reversed())
+                        .forEach(temp::add);
                 break;
             default:
                 return null;
