@@ -3,6 +3,7 @@ package rocks.cow.Server;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import rocks.cow.Player.PlayerList.PlayerList;
 
 import javax.xml.xpath.*;
 import java.util.HashMap;
@@ -16,12 +17,6 @@ public class ServerBuilder {
     private XPathExpression expr;
     private Logger logger = Logger.getGlobal();
 
-
-    public ServerBuilder() {
-        xPathfactory = XPathFactory.newInstance();
-        xpath = xPathfactory.newXPath();
-    }
-
     private String hostname;
     private String name;
     private Optional<String> gameType;
@@ -31,6 +26,15 @@ public class ServerBuilder {
     private int ping;
     private int retries;
     private HashMap<String, String> rules;
+    private PlayerList players;
+    private static final String text = "/text()";
+
+
+    public ServerBuilder() {
+        xPathfactory = XPathFactory.newInstance();
+        xpath = xPathfactory.newXPath();
+    }
+
 
     public ServerBuilder setHostname(String hostname) {
         this.hostname = hostname;
@@ -48,11 +52,6 @@ public class ServerBuilder {
         } else {
             this.gameType = Optional.of(gameType);
         }
-        return this;
-    }
-
-    public ServerBuilder setGameType(Optional<String> gameType) {
-        this.gameType = gameType;
         return this;
     }
 
@@ -86,46 +85,45 @@ public class ServerBuilder {
         return this;
     }
 
+    private String getXPathAsString(final String path, final Node node) {
+        String temp = "";
+        try{
+            if (path.endsWith(text)) {
+                temp = (String) xpath.evaluate(path, node, XPathConstants.STRING);
+            } else {
+                temp = (String) xpath.evaluate(path + text, node, XPathConstants.STRING);
+            }
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    private int getXPathAsInt(String path, final Node node) {
+        return Integer.parseInt(getXPathAsString(path, node));
+    }
+
     public Server build(Node node) {
         try {
 
-            setHostname(
-                    ((Node) xpath.evaluate("hostname", node, XPathConstants.NODE)).getTextContent()
-            );
+            setHostname(getXPathAsString("hostname", node));
 
             logger.log(Level.INFO, String.format("Reading information from ip: %s", hostname));
 
+            setName(getXPathAsString("name", node));
 
-            setName(
-                    ((Node) xpath.evaluate("name", node, XPathConstants.NODE)).getTextContent()
-            );
+            setGameType(getXPathAsString("gametype", node));
 
-            setGameType(
-                    ((Node) xpath.evaluate("gametype", node, XPathConstants.NODE)).getTextContent()
-            );
-
-            setMap(
-                    ((Node) xpath.evaluate("map", node, XPathConstants.NODE)).getTextContent()
-            );
+            setMap(getXPathAsString("map", node));
 
 
-            setNumplayers(
-                    Integer.parseInt(
-                            ((Node) xpath.evaluate("numplayers", node, XPathConstants.NODE))
-                                    .getTextContent())
-            );
+            setNumplayers(getXPathAsInt("numplayers", node));
 
-            setMaxplayers(
-                    Integer.parseInt(
-                            ((Node) xpath.evaluate("maxplayers", node, XPathConstants.NODE))
-                                    .getTextContent())
-            );
+            setMaxplayers(getXPathAsInt("maxplayers", node));
 
-            setPing(
-                    Integer.parseInt(
-                            ((Node) xpath.evaluate("ping", node, XPathConstants.NODE))
-                                    .getTextContent())
-            );
+            setPing(getXPathAsInt("ping", node));
+
+            setRetries(getXPathAsInt("retries", node));
 
             NodeList nodeList = (NodeList) xpath.evaluate("rule", node, XPathConstants.NODESET);
 
@@ -144,6 +142,8 @@ public class ServerBuilder {
     public Server createServer() {
         return new Server(hostname, name, gameType, map, numplayers, maxplayers, ping, retries, rules);
     }
+
+    // example
 
     /*
     <hostname>176.9.22.146:26000</hostname>
