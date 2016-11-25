@@ -1,5 +1,7 @@
 package rocks.cow.Server;
 
+import rocks.cow.Player.PlayerList.PlayerList;
+
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -13,10 +15,9 @@ public class Server {
     private int ping;
     private int retries;
     private HashMap<String, String> rules;
-    // need player class first
-    // private ArrayList<Player> players;
+    private Optional<PlayerList> players;
 
-    public Server(String hostname, String name, Optional<String> gameType, String map, int numplayers, int maxplayers, int ping, int retries, HashMap<String, String> rules) {
+    public Server(String hostname, String name, Optional<String> gameType, String map, int numplayers, int maxplayers, int ping, int retries, HashMap<String, String> rules, Optional<PlayerList> players) {
         this.hostname = hostname;
         this.name = name;
         this.gameType = gameType;
@@ -26,6 +27,7 @@ public class Server {
         this.ping = ping;
         this.retries = retries;
         this.rules = rules;
+        this.players = players;
     }
 
 
@@ -67,5 +69,9 @@ public class Server {
 
     public String getRule(String rule) {
         return rules.get(rule);
+    }
+
+    public Optional<PlayerList> getPlayers() {
+        return players;
     }
 }
