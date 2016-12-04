@@ -9,7 +9,7 @@ public class ServerList extends ArrayList<Server> {
     // TODO: Add other options to retrieve servers by
     public static final byte PLAYERS = 0;
 
-    public ServerList getBy(byte key) {
+    public ServerList getSortedListBy(byte key) {
         ServerList temp = new ServerList();
         switch (key) {
             case 0: // Players
