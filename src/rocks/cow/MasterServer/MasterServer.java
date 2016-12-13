@@ -22,5 +22,4 @@ public class MasterServer {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         return builder.parse(new URL(url).openConnection().getInputStream());
     }
-
 }
