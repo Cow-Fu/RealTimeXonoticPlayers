@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 public class Server {
-    private String hostname;
+    private String address;
     private String name;
     private Optional<String> gameType;
     private String map;
@@ -17,8 +17,8 @@ public class Server {
     private HashMap<String, String> rules;
     private Optional<PlayerList> players;
 
-    public Server(String hostname, String name, Optional<String> gameType, String map, int numplayers, int maxplayers, int ping, int retries, HashMap<String, String> rules, Optional<PlayerList> players) {
-        this.hostname = hostname;
+    public Server(String address, String name, Optional<String> gameType, String map, int numplayers, int maxplayers, int ping, int retries, HashMap<String, String> rules, Optional<PlayerList> players) {
+        this.address = address;
         this.name = name;
         this.gameType = gameType;
         this.map = map;
@@ -31,8 +31,8 @@ public class Server {
     }
 
 
-    public String getHostname() {
-        return hostname;
+    public String getAddress() {
+        return address;
     }
 
     public String getName() {

@@ -12,19 +12,21 @@ import rocks.cow.TableRenderer.TableRenderer;
 public class MultiServerTable implements TableRenderer {
     private V2_AsciiTable at = new V2_AsciiTable();
     private V2_AsciiTableRenderer rend = new V2_AsciiTableRenderer();
+    private ServerList servers;
 
-    public RenderedTable Render(ServerList servers) {
-        // rend.setTheme(V2_E_TableThemes.PLAIN_7BIT.get());
+    public MultiServerTable(ServerList servers) {
         rend.setTheme(V2_E_TableThemes.PLAIN_7BIT_STRONG.get());
         rend.setWidth(new WidthLongestLine());
+        this.servers = servers;
+    }
 
+    public RenderedTable render() {
         at.addRule();
-        at.addRow("Host Name", "Server Name", "Players", "Map");
+        at.addRow("Address", "Server Name", "Players", "Map");
         at.addRule();
         servers.forEach(server -> {
-
                     at.addRow(
-                            server.getHostname(),
+                            server.getAddress(),
                             server.getName(),
                             String.format("%s/%s", server.getNumplayers(), server.getMaxplayers()),
                             server.getMap()
@@ -33,5 +35,10 @@ public class MultiServerTable implements TableRenderer {
         at.addRule();
 
         return rend.render(at);
+    }
+
+    public MultiServerTable setServers(ServerList servers) {
+        this.servers = servers;
+        return this;
     }
 }

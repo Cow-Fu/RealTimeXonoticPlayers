@@ -6,7 +6,7 @@ import rocks.cow.TableRenderer.TableRenderer;
 
 public class SingleServerTable implements TableRenderer {
 
-    public RenderedTable Render(ServerList servers) {
+    public RenderedTable render() {
         return null;
     }
 }
