@@ -20,5 +20,6 @@ repositories {
 
 dependencies {
     compile 'de.vandermeer:asciitable:0.2.5'
+    compile 'net.sourceforge.argparse4j:argparse4j:0.7.0' // use this for argument parsing
 //    testCompile group: 'junit', name: 'junit', version: '4.11'
 }
