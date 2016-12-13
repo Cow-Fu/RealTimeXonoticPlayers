@@ -19,11 +19,12 @@ public class MultiServerTable implements TableRenderer {
         rend.setWidth(new WidthLongestLine());
 
         at.addRule();
-        at.addRow("Server Name", "Players", "Map");
+        at.addRow("Host Name", "Server Name", "Players", "Map");
         at.addRule();
         servers.forEach(server -> {
 
                     at.addRow(
+                            server.getHostname(),
                             server.getName(),
                             String.format("%s/%s", server.getNumplayers(), server.getMaxplayers()),
                             server.getMap()
