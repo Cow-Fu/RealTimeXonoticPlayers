@@ -15,7 +15,6 @@ public class PlayerList extends ArrayList<Player> {
         switch (key) {
             case 0: // Score
                 this.stream()
-                        .filter(player -> player.getScore() > 0)
                         .sorted(Comparator.comparingInt(Player::getScore).reversed())
                         .forEach(temp::add);
                 break;
