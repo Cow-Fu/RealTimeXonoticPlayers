@@ -7,7 +7,9 @@ import rocks.cow.Query.MasterServerQuery.MasterServerQuery;
 import rocks.cow.Query.SingleServerQuery.SingleServerQuery;
 import rocks.cow.Server.Server;
 import rocks.cow.Server.ServerList.ServerList;
+import rocks.cow.TableRenderer.TableRenderer;
 import rocks.cow.TableRenderer.TableRendererImpl.MultiServerTable;
+import rocks.cow.TableRenderer.TableRendererImpl.SingleServerTable;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 public class Main {
     public static void main(String[] args) {
         Optional<String> optId;
+        TableRenderer tableRender = null;
         Logger logger = Logger.getGlobal();
         logger.setLevel(Level.WARNING);
         logger.log(Level.INFO, "Huston, we have a logger.");
@@ -36,28 +39,26 @@ public class Main {
 
         if (optId.isPresent()) {
             System.out.println(optId.get());
-            Server server;
+            Server server = null;
             try {
                 server = new SingleServerQuery(optId.get()).getServer();
-                // System.out.println(server.getPlayers().);
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
             }
+            tableRender = new SingleServerTable(server);
 
-            server
-            return;
+        } else {
+            Optional<ServerList> optServers = Optional.empty();
+
+            try {
+                optServers = Optional.of(new MasterServerQuery().getServerList());
+            } catch (ParserConfigurationException | SAXException | XPathExpressionException | IOException e) {
+                e.printStackTrace();
+            }
+
+            if (!optServers.isPresent()) return;
+            tableRender = new MultiServerTable(optServers.get().getSortedListBy(ServerList.PLAYERS));
         }
-        Optional<ServerList> optServers = Optional.empty();
-
-        try {
-            optServers = Optional.of(new MasterServerQuery().getServerList());
-        } catch (ParserConfigurationException | SAXException | XPathExpressionException | IOException e) {
-            e.printStackTrace();
-        }
-
-        if (!optServers.isPresent()) return;
-
-        System.out.print(new MultiServerTable().Render(optServers.get().getSortedListBy(ServerList.PLAYERS)));
-
+        System.out.print(tableRender.render());
     }
 }
