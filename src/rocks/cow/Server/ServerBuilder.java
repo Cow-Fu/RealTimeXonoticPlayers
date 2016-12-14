@@ -161,7 +161,12 @@ public class ServerBuilder {
         if (playerNode != null) {
             if (playerNode.hasChildNodes()) {
                 PlayerList temp = new PlayerList();
-                NodeList playerNodes = playerNode.getChildNodes();
+                NodeList playerNodes = null;
+                try {
+                    playerNodes = (NodeList) xpath.evaluate("player", playerNode, XPathConstants.NODESET);
+                } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                }
                 for (int i = 0; i < playerNodes.getLength(); ++i) {
                     Node player = playerNodes.item(i);
                     playerBuilder
