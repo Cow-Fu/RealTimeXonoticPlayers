@@ -9,18 +9,27 @@ import rocks.cow.Server.ServerList.ServerList;
 import rocks.cow.TableRenderer.TableRenderer;
 
 
-public class MultiServerTable implements TableRenderer {
-    private V2_AsciiTable at = new V2_AsciiTable();
-    private V2_AsciiTableRenderer rend = new V2_AsciiTableRenderer();
-    private ServerList servers;
+public class MultiServerTable extends TableRenderer {
+    private ServerList servers = null;
+
+    public MultiServerTable() {
+        initTable();
+    }
 
     public MultiServerTable(ServerList servers) {
-        rend.setTheme(V2_E_TableThemes.PLAIN_7BIT_STRONG.get());
-        rend.setWidth(new WidthLongestLine());
+        initTable();
+        setServers(servers);
+    }
+
+    public MultiServerTable setServers(ServerList servers) {
         this.servers = servers;
+        return this;
     }
 
     public RenderedTable render() {
+        if (servers.equals(null)) {
+            return null;
+        }
         at.addRule();
         at.addRow("Address", "Server Name", "Players", "Map");
         at.addRule();
@@ -35,10 +44,5 @@ public class MultiServerTable implements TableRenderer {
         at.addRule();
 
         return rend.render(at);
-    }
-
-    public MultiServerTable setServers(ServerList servers) {
-        this.servers = servers;
-        return this;
     }
 }
