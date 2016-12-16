@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class MasterServer {
-    private static String masterServerUrl = "http://dpmaster.deathmask.net/?game=xonotic&hide=empty&nocolors=1&xml=1";
+    private static String masterServerUrl = "http://dpmaster.deathmask.net/?game=xonotic&hide=empty&nocolors=1&xml=1&utf8=1";
 
     public static Document masterServerQuery() throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
