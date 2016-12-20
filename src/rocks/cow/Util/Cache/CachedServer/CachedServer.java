@@ -1,4 +1,4 @@
-package rocks.cow.CachedServer;
+package rocks.cow.Util.Cache.CachedServer;
 
 public class CachedServer {
     private String name;

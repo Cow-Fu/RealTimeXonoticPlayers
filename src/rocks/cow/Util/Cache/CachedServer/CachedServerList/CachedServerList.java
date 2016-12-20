@@ -1,6 +1,6 @@
-package rocks.cow.CachedServer.CachedServerList;
+package rocks.cow.Util.Cache.CachedServer.CachedServerList;
 
-import rocks.cow.CachedServer.CachedServer;
+import rocks.cow.Util.Cache.CachedServer.CachedServer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
