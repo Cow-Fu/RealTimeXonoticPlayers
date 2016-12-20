@@ -5,12 +5,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import rocks.cow.Player.PlayerBuilder;
 import rocks.cow.Player.PlayerList.PlayerList;
+import rocks.cow.Util.ColorStripper;
 
 import javax.xml.xpath.*;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerBuilder {
@@ -170,7 +170,7 @@ public class ServerBuilder {
                 for (int i = 0; i < playerNodes.getLength(); ++i) {
                     Node player = playerNodes.item(i);
                     playerBuilder
-                            .setName(getXPathAsString("name", player))
+                            .setName(ColorStripper.stripColorTags(getXPathAsString("name", player)))
                             .setScore(getXPathAsInt("score", player))
                             .setPing(getXPathAsInt("ping", player));
                     temp.add(playerBuilder.createPlayer());
