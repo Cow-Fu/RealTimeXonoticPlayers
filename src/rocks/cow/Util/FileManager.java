@@ -42,16 +42,17 @@ public class FileManager {
     }
 
     public String read() throws IOException {
-        String temp = "";
+        String data = "";
         String line;
 
         BufferedReader fr = new BufferedReader(new FileReader(file));
 
         while((line = fr.readLine()) != null) {
-            temp = temp.concat(line + "\n");
+            data = data.concat(line + "\n");
         }
+
         fr.close();
-        return temp;
+        return data;
     }
     public void write(String data) throws IOException {
         BufferedWriter fw = new BufferedWriter(new FileWriter(file));
