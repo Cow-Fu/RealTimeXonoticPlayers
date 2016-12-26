@@ -6,17 +6,14 @@ import org.w3c.dom.NodeList;
 import rocks.cow.Player.PlayerBuilder;
 import rocks.cow.Player.PlayerList.PlayerList;
 import rocks.cow.Util.ColorStripper;
+import rocks.cow.Util.XPathUtils;
 
-import javax.xml.xpath.*;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.logging.Logger;
 
 public class ServerBuilder {
-    private XPath xpath;
-    private XPathExpression expr;
-    private XPathFactory xPathfactory;
+    private XPathUtils xpath = new XPathUtils();
     private Logger logger = Logger.getGlobal();
     private PlayerBuilder playerBuilder = new PlayerBuilder();
 
@@ -32,13 +29,7 @@ public class ServerBuilder {
     private int retries;
     private HashMap<String, String> rules;
     private Optional<PlayerList> players = Optional.empty();
-    private static final String text = "/text()";  // for xpath's text property
 
-
-    public ServerBuilder() {
-        xPathfactory = XPathFactory.newInstance();
-        xpath = xPathfactory.newXPath();
-    }
 
     public ServerBuilder setNode(Node node) {
         this.node = node;
@@ -46,18 +37,18 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setHostName() {
-        setHostname(getXPathAsString("hostname", node));
+        xpath.getXPathAsString("hostname", node).ifPresent(this::setHostName);
         return this;
     }
 
 
-    public ServerBuilder setHostname(String hostname) {
+    public ServerBuilder setHostName(String hostname) {
         this.hostname = hostname;
         return this;
     }
 
     public ServerBuilder setName() {
-        setName(getXPathAsString("name", node));
+        xpath.getXPathAsString("name", node).ifPresent(this::setName);
         return this;
     }
 
@@ -67,12 +58,12 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setGameType () {
-        setGameType(getXPathAsString("gametype", node));
+        xpath.getXPathAsString("gametype", node).ifPresent(this::setGameType);
         return this;
     }
 
     public ServerBuilder setGameType (String gameType) {
-        if (gameType.equals("")) {
+        if (gameType.equals("")) { // this will need to be changed for issue #1
             this.gameType = Optional.empty();
         } else {
             this.gameType = Optional.of(gameType);
@@ -81,7 +72,7 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setMap() {
-        setMap(getXPathAsString("map", node));
+        xpath.getXPathAsString("map", node).ifPresent(this::setMap);
         return this;
     }
 
@@ -91,7 +82,7 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setNumplayers() {
-        setNumplayers(getXPathAsInt("numplayers", node));
+        xpath.getXPathAsInt("numplayers", node).ifPresent(this::setNumplayers);
         return this;
     }
 
@@ -101,7 +92,7 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setMaxplayers() {
-        setMaxplayers(getXPathAsInt("maxplayers", node));
+        xpath.getXPathAsInt("maxplayers", node).ifPresent(this::setMaxplayers);
         return this;
     }
 
@@ -111,7 +102,7 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setPing() {
-        setPing(getXPathAsInt("ping", node));
+        xpath.getXPathAsInt("ping", node).ifPresent(this::setPing);
         return this;
     }
 
@@ -121,7 +112,7 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setRetries() {
-        setRetries(getXPathAsInt("retries", node));
+        xpath.getXPathAsInt("retries", node).ifPresent(this::setRetries);
         return this;
     }
 
@@ -131,13 +122,9 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setRules() {
-        NodeList nodeList = null;
-        try {
-            nodeList = (NodeList) xpath.evaluate("rule", node, XPathConstants.NODESET);
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }
-        if (nodeList != null) {
+        Optional<NodeList> optNodeList = xpath.getXPathAsNodeList("rule", node);
+        if (optNodeList.isPresent()) {
+            NodeList nodeList = optNodeList.get();
             for (int i = 0; i < nodeList.getLength(); ++i) {
                 Node nnode = nodeList.item(i);
                 rules.put(((Element) nnode).getAttribute("name"), nnode.getTextContent());
@@ -152,32 +139,21 @@ public class ServerBuilder {
     }
 
     public ServerBuilder setPlayers() {
-        Node playerNode = null;
-        try {
-            playerNode = (Node) xpath.evaluate("players", node, XPathConstants.NODE);
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }
-        if (playerNode != null) {
-            if (playerNode.hasChildNodes()) {
-                PlayerList temp = new PlayerList();
-                NodeList playerNodes = null;
-                try {
-                    playerNodes = (NodeList) xpath.evaluate("player", playerNode, XPathConstants.NODESET);
-                } catch (XPathExpressionException e) {
-                    e.printStackTrace();
-                }
+        Optional<Node> optPlayerNode = xpath.getXPathAsNode("players", node);
+        if (optPlayerNode.isPresent()) {
+            Optional<NodeList> optPlayerNodes = xpath.getXPathAsNodeList("player", optPlayerNode.get());
+            if (optPlayerNodes.isPresent()) {
+                PlayerList players = new PlayerList();
+                NodeList playerNodes = optPlayerNodes.get();
                 for (int i = 0; i < playerNodes.getLength(); ++i) {
                     Node player = playerNodes.item(i);
-                    playerBuilder
-                            .setName(ColorStripper.stripColorTags(getXPathAsString("name", player)))
-                            .setScore(getXPathAsInt("score", player))
-                            .setPing(getXPathAsInt("ping", player));
-                    temp.add(playerBuilder.createPlayer());
+                    xpath.getXPathAsString("name", player).ifPresent(name ->
+                                playerBuilder.setName(ColorStripper.stripColorTags(name)));
+                    xpath.getXPathAsInt("score", player).ifPresent(playerBuilder::setScore);
+                    xpath.getXPathAsInt("ping", player).ifPresent(playerBuilder::setPing);
+                    players.add(playerBuilder.createPlayer());
                 }
-                setPlayers(Optional.of(temp));
-            } else {
-                players = Optional.empty();
+                setPlayers(Optional.of(players));
             }
         }
         return this;
@@ -186,36 +162,6 @@ public class ServerBuilder {
     public ServerBuilder setPlayers(Optional<PlayerList> players) {
         this.players = players;
         return this;
-    }
-
-    private String getXPathAsString(String path, final Node node) {
-        String temp = "";
-
-        if (!path.endsWith(text)) {
-            path += text;
-        }
-
-        try{
-            temp = (String) xpath.evaluate(path, node, XPathConstants.STRING);
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }
-        return temp;
-    }
-
-    private int getXPathAsInt(String path, final Node node) {
-        OptionalInt temp = OptionalInt.empty();
-        if (!path.endsWith(text)) {
-            path += text;
-        }
-
-        try{
-            temp = OptionalInt.of(((Number) xpath.evaluate(path, node, XPathConstants.NUMBER)).intValue());
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }
-
-        return temp.getAsInt();
     }
 
     public Server build(Node node) {
