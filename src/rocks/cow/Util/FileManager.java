@@ -15,6 +15,10 @@ public class FileManager {
         setFile(file);
     }
 
+    public File getFile() {
+        return file;
+    }
+
     public void setFile(File file) {
         this.file = file;
     }
@@ -37,8 +41,14 @@ public class FileManager {
         return parent.mkdirs();
     }
 
-    public boolean createFile() throws IOException {
-        return createPath() && file.createNewFile();
+    public boolean createFile() {
+        try {
+            createPath();
+            file.createNewFile();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     public String read() throws IOException {
